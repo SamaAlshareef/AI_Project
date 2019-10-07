@@ -43,10 +43,13 @@ public class EndGameProblem extends GenericSearchProblem{
 	private static EndGameState CurrentState;
 	private static Queue<Node> nodes;
 	
+	private static ArrayList<EndGameState> AllStates;
+	
 	public EndGameProblem(String grid) {
 		Warriors = new HashMap<Point, String>();
 		Stones = new HashMap<Point, String>();
 		ActionsMap = new HashMap<Actions, Boolean>();
+		AllStates = new ArrayList<EndGameState>();
 		InstantiateActionMap();
 		String tempGrid = grid.substring(0, 4);
 		 GridWidth = Character.getNumericValue(tempGrid.charAt(0));
@@ -55,20 +58,20 @@ public class EndGameProblem extends GenericSearchProblem{
 		 
 		 //Set Ironman position
 		 tempGrid = grid.substring(0, 4);
-		 Point IronManPosition = new Point(Character.getNumericValue(tempGrid.charAt(0)),Character.getNumericValue(tempGrid.charAt(2)));
+		 Point IronManPosition = new Point(Character.getNumericValue(tempGrid.charAt(2)),Character.getNumericValue(tempGrid.charAt(0)));
 		 InitialState = new EndGameState(IronManPosition);
 		 grid = grid.substring(4, grid.length());
 		 
 		 //Set Thanos position
 		 tempGrid = grid.substring(0, 4);
-		 ThanosPos = new Point(Character.getNumericValue(tempGrid.charAt(0)),Character.getNumericValue(tempGrid.charAt(2)));
+		 ThanosPos = new Point(Character.getNumericValue(tempGrid.charAt(2)),Character.getNumericValue(tempGrid.charAt(0)));
 		 grid = grid.substring(4, grid.length());
 		 
 		 //Set Stones positions
 		 for(int i=0; i<6; i++) 
 		 {
 			 tempGrid = grid.substring(0, 4);
-			 Point tmpPoint = new Point(Character.getNumericValue(tempGrid.charAt(0)),Character.getNumericValue(tempGrid.charAt(2)));
+			 Point tmpPoint = new Point(Character.getNumericValue(tempGrid.charAt(2)),Character.getNumericValue(tempGrid.charAt(0)));
 			 Stones.put(tmpPoint, "s"+(i+1));
 			 grid = grid.substring(4, grid.length());
 			 
@@ -81,7 +84,7 @@ public class EndGameProblem extends GenericSearchProblem{
 			 if(grid.length() == 3) 
 			 {
 				 tempGrid = grid.substring(0, 3);
-				 Point tmpPoint2 = new Point(Character.getNumericValue(tempGrid.charAt(0)),Character.getNumericValue(tempGrid.charAt(2)));
+				 Point tmpPoint2 = new Point(Character.getNumericValue(tempGrid.charAt(2)),Character.getNumericValue(tempGrid.charAt(0)));
 				 Warriors.put(tmpPoint2, "w"+(WarriorsCount+1));
 				 WarriorsCount++;
 				 break;
@@ -89,7 +92,7 @@ public class EndGameProblem extends GenericSearchProblem{
 			 else 
 			 {
 				 tempGrid = grid.substring(0, 4);
-				 Point tmpPoint = new Point(Character.getNumericValue(tempGrid.charAt(0)),Character.getNumericValue(tempGrid.charAt(2)));
+				 Point tmpPoint = new Point(Character.getNumericValue(tempGrid.charAt(2)),Character.getNumericValue(tempGrid.charAt(0)));
 				 Warriors.put(tmpPoint, "w"+(WarriorsCount+1));
 				 WarriorsCount++;
 				 grid = grid.substring(4, grid.length());
@@ -105,64 +108,64 @@ public class EndGameProblem extends GenericSearchProblem{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
   
 	//EXPAND FUNCTION HELPERS
-	void CheckMovement() {
+	void CheckMovement(EndGameState currState) {
 		Point cell = new Point();
 		
 		//Check UP
-		cell = GetCell(CurrentState.IronManPos,Actions.UP);
+		cell = GetCell(currState.IronManPos,Actions.UP);
 		if(CheckBorder(cell)) {
 			ActionsMap.replace(Actions.UP, false);
 		}
 		
 		
 		//Check Right
-		cell = GetCell(CurrentState.IronManPos,Actions.RIGHT);
+		cell = GetCell(currState.IronManPos,Actions.RIGHT);
 		if(CheckBorder(cell)) {
 			ActionsMap.replace(Actions.RIGHT, false);
 		}
 		
 		//Check Left
-		cell = GetCell(CurrentState.IronManPos,Actions.LEFT);
+		cell = GetCell(currState.IronManPos,Actions.LEFT);
 		if(CheckBorder(cell)) {
 			ActionsMap.replace(Actions.LEFT, false);
 		}
 		
 		//Check Down
-		cell = GetCell(CurrentState.IronManPos,Actions.DOWN);
+		cell = GetCell(currState.IronManPos,Actions.DOWN);
 		if(CheckBorder(cell)) {
 			ActionsMap.replace(Actions.DOWN, false);
 		}
 	}
 	
 	
-	void CheckWarriors(){
+	void CheckWarriors(EndGameState currState){
 		Point cell = new Point();
 		Boolean WarriorsClear = true;
 		
 		//Check UP
-		cell = GetCell(CurrentState.IronManPos,Actions.UP);
-		if(Warriors.get(cell) != null) {
+		cell = GetCell(currState.IronManPos,Actions.UP);
+		if((Warriors.get(cell) != null) && (currState.CollectesWarriors.get(cell) == null)) {
 			ActionsMap.replace(Actions.UP, false);
 			WarriorsClear = false;
 		}
 		
 		//Check Right
-		cell = GetCell(CurrentState.IronManPos,Actions.RIGHT);
-		if(Warriors.get(cell) != null) {
+		cell = GetCell(currState.IronManPos,Actions.RIGHT);
+		if((Warriors.get(cell) != null) && (currState.CollectesWarriors.get(cell) == null)) {
 			ActionsMap.replace(Actions.RIGHT, false);
 			WarriorsClear = false;
 		}
 		
 		//Check Left
-		cell = GetCell(CurrentState.IronManPos,Actions.LEFT);
-		if(Warriors.get(cell) != null) {
+		cell = GetCell(currState.IronManPos,Actions.LEFT);
+		if((Warriors.get(cell) != null) && (currState.CollectesWarriors.get(cell) == null)) {
 			ActionsMap.replace(Actions.LEFT, false);
 			WarriorsClear = false;
 		}
 		
 		//Check Down
-		cell = GetCell(CurrentState.IronManPos,Actions.DOWN);
-		if(Warriors.get(cell) != null) {
+		cell = GetCell(currState.IronManPos,Actions.DOWN);
+		if((Warriors.get(cell) != null) && (currState.CollectesWarriors.get(cell) == null)) {
 			ActionsMap.replace(Actions.DOWN, false);
 			WarriorsClear = false;
 		}
@@ -173,37 +176,39 @@ public class EndGameProblem extends GenericSearchProblem{
 		
 	}
 	
-	void CheckThanos() {
+	void CheckThanos(EndGameState currState) {
 		
 		Point cell = new Point();
 		
-		//Check Up
-		cell = GetCell(CurrentState.IronManPos, Actions.UP);
 		
-		if((CurrentState.ReceivedDamage > 100) || (CurrentState.CollectedStones.size() != 6)) 
+		
+		
+		if((currState.CollectedStones.size() != 6)) 
 		{
-			if (cell == ThanosPos) 
+			//Check Up
+			cell = GetCell(currState.IronManPos, Actions.UP);
+			if ((cell.x == ThanosPos.x) && (cell.y == ThanosPos.y)) 
 			{
 				ActionsMap.replace(Actions.UP, false);
 			}
 			
 			//Check Right
-			cell = GetCell(CurrentState.IronManPos, Actions.RIGHT);
-			if (cell == ThanosPos) 
+			cell = GetCell(currState.IronManPos, Actions.RIGHT);
+			if ((cell.x == ThanosPos.x) && (cell.y == ThanosPos.y)) 
 			{
 				ActionsMap.replace(Actions.RIGHT, false);
 			}
 			
 			//Check Left
-			cell = GetCell(CurrentState.IronManPos, Actions.LEFT);
-			if (cell == ThanosPos) 
+			cell = GetCell(currState.IronManPos, Actions.LEFT);
+			if ((cell.x == ThanosPos.x) && (cell.y == ThanosPos.y)) 
 			{
 				ActionsMap.replace(Actions.LEFT, false);
 			}
 			
 			//Check Down
-			cell = GetCell(CurrentState.IronManPos, Actions.DOWN);
-			if (cell == ThanosPos) 
+			cell = GetCell(currState.IronManPos, Actions.DOWN);
+			if ((cell.x == ThanosPos.x) && (cell.y == ThanosPos.y)) 
 			{
 				ActionsMap.replace(Actions.DOWN, false);
 			}
@@ -213,22 +218,22 @@ public class EndGameProblem extends GenericSearchProblem{
 	}
 	
 	
-	void CheckStones() 
+	void CheckStones(EndGameState currState) 
 	{
 		 Point cell = new Point();
 		 
 		 //Check Stone in the current cell
-		 cell = CurrentState.IronManPos;
-		 if(Stones.get(cell) == null) 
+		 cell = currState.IronManPos;
+		 if((Stones.get(cell) == null) || (currState.CollectedStones.get(cell) != null)) 
 		 {
 			 ActionsMap.replace(Actions.COLLECT,false);
 		 }
      
 	}
 	
-	void CheckSnap() 
+	void CheckSnap(EndGameState currState) 
 	{
-		if (CurrentState.IronManPos != ThanosPos)
+		if (currState.IronManPos != ThanosPos)
 		{
 			ActionsMap.replace(Actions.SNAP, false);
 		}
@@ -253,18 +258,18 @@ public class EndGameProblem extends GenericSearchProblem{
 		ActionsMap.put(Actions.SNAP, true);
 	}
 	//Expand Function
-	HashMap<Actions,Boolean> Expand() 
+	HashMap<Actions,Boolean> Expand(EndGameState currState) 
 	{
-		CheckMovement();
-		CheckWarriors();
-		CheckStones();
-		CheckThanos();
-		CheckSnap();
+		CheckMovement(currState);
+		CheckWarriors(currState);
+		CheckStones(currState);
+		CheckThanos(currState);
+		CheckSnap(currState);
 		
-		HashMap<Actions,Boolean> tempActionsMap = ActionsMap;
-		ResetActionsMap();
 		
-		return tempActionsMap;
+		
+		
+		return ActionsMap;
 	}
 	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,8 +281,8 @@ public class EndGameProblem extends GenericSearchProblem{
 	//Move Up Transition Function
 	EndGameState MoveUpTransitionFunction(EndGameState state) 
 	{
-		Point NewPosition = new Point(state.IronManPos.x, state.IronManPos.y + 1);
-		int DealtDamage = CalculateAllDamage(NewPosition);
+		Point NewPosition = new Point(state.IronManPos.x, state.IronManPos.y - 1);
+		int DealtDamage = CalculateAllDamage(NewPosition, state);
 		EndGameState NewState = new EndGameState(NewPosition, state.ReceivedDamage + DealtDamage , state.CollectedStones , state.CollectesWarriors);
 		
 		return NewState;
@@ -287,7 +292,7 @@ public class EndGameProblem extends GenericSearchProblem{
 	EndGameState MoveRightTransitionFunction(EndGameState state) 
 	{
 		Point NewPosition = new Point(state.IronManPos.x + 1, state.IronManPos.y);
-		int DealtDamage = CalculateAllDamage(NewPosition);
+		int DealtDamage = CalculateAllDamage(NewPosition, state);
 		EndGameState NewState = new EndGameState(NewPosition, state.ReceivedDamage + DealtDamage , state.CollectedStones , state.CollectesWarriors);
 		
 		return NewState;
@@ -297,7 +302,7 @@ public class EndGameProblem extends GenericSearchProblem{
 	EndGameState MoveLeftTransitionFunction(EndGameState state) 
 	{
 		Point NewPosition = new Point(state.IronManPos.x - 1, state.IronManPos.y);
-		int DealtDamage = CalculateAllDamage(NewPosition);
+		int DealtDamage = CalculateAllDamage(NewPosition, state);
 		EndGameState NewState = new EndGameState(NewPosition, state.ReceivedDamage + DealtDamage , state.CollectedStones , state.CollectesWarriors);
 		
 		return NewState;
@@ -306,8 +311,8 @@ public class EndGameProblem extends GenericSearchProblem{
 	//Move Down Transition Function
 	EndGameState MoveDownTransitionFunction(EndGameState state) 
 	{
-		Point NewPosition = new Point(state.IronManPos.x, state.IronManPos.y - 1);
-		int DealtDamage = CalculateAllDamage(NewPosition);
+		Point NewPosition = new Point(state.IronManPos.x, state.IronManPos.y + 1);
+		int DealtDamage = CalculateAllDamage(NewPosition, state);
 		EndGameState NewState = new EndGameState(NewPosition, state.ReceivedDamage + DealtDamage , state.CollectedStones , state.CollectesWarriors);
 		
 		return NewState;
@@ -316,15 +321,21 @@ public class EndGameProblem extends GenericSearchProblem{
 	//Collect Stones Transition Function
 	EndGameState CollecStonesTransitionFunction(EndGameState state) 
 	{
+		//BAYZAAAA
+		HashMap<Point, String> newStones = CreateMirrorMap(state.CollectedStones);
 		
-		if(Stones.get(state.IronManPos) != null) 
+		int newDamage = state.ReceivedDamage;
+		
+		if(state.CollectedStones.get(state.IronManPos) == null) 
 		{
-			state.ReceivedDamage += 3;
-			state.CollectedStones.put(state.IronManPos , Stones.get(state.IronManPos));
-			Stones.remove(state.IronManPos);
+			EndGameState NewState = new EndGameState(state.IronManPos, newDamage , newStones , state.CollectesWarriors);
+			NewState.CollectedStones.put(state.IronManPos , Stones.get(state.IronManPos));
+			NewState.ReceivedDamage += 3;
+			return NewState;	
 		}
 		
-		return state;	
+		else
+			return state;
 	}
 	
 	//Killing Warriors in Adjacent Cells
@@ -332,47 +343,53 @@ public class EndGameProblem extends GenericSearchProblem{
 	{
 		Point cell = new Point();
 		
+		
+		HashMap<Point, String> newWarriors = CreateMirrorMap(state.CollectesWarriors);
+		int newDamage = state.ReceivedDamage;
+		EndGameState NewState = new EndGameState(state.IronManPos, newDamage , state.CollectedStones , newWarriors);
+		
 		//Check up
 		cell = GetCell(state.IronManPos, Actions.UP);
-		if (Warriors.get(cell) != null) 
+		if (NewState.CollectesWarriors.get(cell) == null) 
 		{
-			state.ReceivedDamage += 2;
-			state.CollectesWarriors.put(cell , Warriors.get(cell));
-			Warriors.remove(cell);
+			
+			NewState.ReceivedDamage += 2;
+			NewState.CollectesWarriors.put(cell , Warriors.get(cell));
+			
 			
 		}
 		
 		//Check Right
 		cell = GetCell(state.IronManPos, Actions.RIGHT);
-		if (Warriors.get(cell) != null) 
+		if (NewState.CollectesWarriors.get(cell) == null) 
 		{
-			state.ReceivedDamage += 2;
-			state.CollectesWarriors.put(cell , Warriors.get(cell));
-			Warriors.remove(cell);
+			NewState.ReceivedDamage += 2;
+			NewState.CollectesWarriors.put(cell , Warriors.get(cell));
+			
 			
 		}
 		
 		//Check Left
 		cell = GetCell(state.IronManPos, Actions.LEFT);
-		if (Warriors.get(cell) != null) 
+		if (NewState.CollectesWarriors.get(cell) == null) 
 		{
-			state.ReceivedDamage += 2;
-			state.CollectesWarriors.put(cell , Warriors.get(cell));
-			Warriors.remove(cell);
+			NewState.ReceivedDamage += 2;
+			NewState.CollectesWarriors.put(cell , Warriors.get(cell));
+			
 			
 		}
 		
 		//Check Down
 		cell = GetCell(state.IronManPos, Actions.DOWN);
-		if (Warriors.get(cell) != null) 
+		if (NewState.CollectesWarriors.get(cell) == null) 
 		{
-			state.ReceivedDamage += 2;
-			state.CollectesWarriors.put(cell , Warriors.get(cell));
-			Warriors.remove(cell);
+			NewState.ReceivedDamage += 2;
+			NewState.CollectesWarriors.put(cell , Warriors.get(cell));
+			
 			
 		}
 		
-		return state;
+		return NewState;
 		
 		
 	}
@@ -401,28 +418,29 @@ public class EndGameProblem extends GenericSearchProblem{
 	void GeneralSearch(EndGameProblem problem, QingFunc QF ) {
 		
 		nodes = new LinkedList<Node>();
-		CurrentNode = new Node(InitialState, true);
-		Tree tree = new Tree(CurrentNode);
-		nodes.add(CurrentNode);
+		Node currentNode = new Node(InitialState, true);
+		Tree tree = new Tree(currentNode);
+		nodes.add(currentNode);
 		
-		while(!nodes.isEmpty())
+		do
 		{
-			CurrentNode = nodes.remove();
-			CurrentState = CurrentNode.state;
-			if(GoalTest(CurrentNode.state))
+			currentNode = nodes.remove();
+			
+			if(GoalTest(currentNode.state))
 			{
-				PrintSolution(GetPath(CurrentNode));
+				PrintSolution(GetPath(currentNode));
+				return;
 			}
 			
 			
 			switch(QF) 
 			{
 			case BFS:
-				BFS(Expand());
+				BFS(Expand(currentNode.state),currentNode);
 			
 			}
 			
-		}
+		}while(!nodes.isEmpty());
 		
 	}
 	
@@ -436,16 +454,18 @@ public class EndGameProblem extends GenericSearchProblem{
 	
 	//QING FUNCTIONS
 	
-	void BFS(HashMap<Actions, Boolean> possibleActions) 
+	void BFS(HashMap<Actions, Boolean> possibleActions, Node currentNode) 
 	{
 		Queue<Node> generatedNodes = new LinkedList<Node>();
 		
-		generatedNodes = GenerateNodes(possibleActions);
+		generatedNodes = GenerateNodes(possibleActions,currentNode);
 		
 		while(!generatedNodes.isEmpty()) 
 		{
 			nodes.add(generatedNodes.remove());
 		}
+		
+		ResetActionsMap();
 	}
 	
 	
@@ -453,18 +473,35 @@ public class EndGameProblem extends GenericSearchProblem{
 	
 	
 	
-	Queue<Node> GenerateNodes(HashMap<Actions, Boolean> possibleActions)
+	Queue<Node> GenerateNodes(HashMap<Actions, Boolean> possibleActions, Node currentNode)
 	{
 		Queue<Node> genratedNodes = new LinkedList<Node>();
 		EndGameState newState = null;
+		EndGameState checkingState = null;
 		Node childNode = null;
-		for (Map.Entry<Actions,Boolean> entry : ActionsMap.entrySet()) 
+		for (Map.Entry<Actions,Boolean> entry : possibleActions.entrySet()) 
 		{
+			
 			if(entry.getValue()) 
 			{
-				newState = GenerateState(entry.getKey());
-				childNode = CurrentNode.MakeChild(newState, entry.getKey());
-				genratedNodes.add(childNode);
+				Boolean isStateExist = false;
+				newState = GenerateState(entry.getKey(), currentNode.state);
+				checkingState = new EndGameState(newState.IronManPos,0,newState.CollectedStones,newState.CollectesWarriors);
+				for(int i = 0; i<AllStates.size(); i++)
+				{
+					if(CompareStates(AllStates.get(i), checkingState)) 
+					{
+						isStateExist = true;
+					}
+					
+				}
+				if(!isStateExist) 
+				{
+					childNode = currentNode.MakeChild(newState, entry.getKey());
+					genratedNodes.add(childNode);
+					AllStates.add(checkingState);
+				}
+					
 			}
 			
 		
@@ -475,31 +512,31 @@ public class EndGameProblem extends GenericSearchProblem{
 	}
 	
 	
-	EndGameState GenerateState(Actions action) 
+	EndGameState GenerateState(Actions action, EndGameState currState) 
 	{
 		EndGameState newState = null;
 		switch(action)
 		{
 		case UP:
-			newState = MoveUpTransitionFunction(CurrentState);
+			newState = MoveUpTransitionFunction(currState);
 			break;
 		case RIGHT:
-			newState = MoveRightTransitionFunction(CurrentState);
+			newState = MoveRightTransitionFunction(currState);
 			break;
 		case LEFT:
-			newState = MoveLeftTransitionFunction(CurrentState);
+			newState = MoveLeftTransitionFunction(currState);
 			break;
 		case DOWN:
-			newState = MoveDownTransitionFunction(CurrentState);
+			newState = MoveDownTransitionFunction(currState);
 			break;
 		case KILL:
-			newState = KillTransitionFunction(CurrentState);
+			newState = KillTransitionFunction(currState);
 			break;
 		case COLLECT:
-			newState = CollecStonesTransitionFunction(CurrentState);
+			newState = CollecStonesTransitionFunction(currState);
 			break;
 		case SNAP:
-			newState = SnapTransitionFunction(CurrentState);
+			newState = SnapTransitionFunction(currState);
 			break;
 		}
 		
@@ -517,7 +554,7 @@ public class EndGameProblem extends GenericSearchProblem{
 		switch(action)
 		{
 		case UP:
-			newPoint.setLocation(self.x, self.y+1);
+			newPoint.setLocation(self.x, self.y-1);
 			break;
 		case RIGHT:
 			newPoint.setLocation(self.x+1, self.y);
@@ -526,7 +563,7 @@ public class EndGameProblem extends GenericSearchProblem{
 			newPoint.setLocation(self.x-1, self.y);
 			break;
 		case DOWN:
-			newPoint.setLocation(self.x, self.y-1);
+			newPoint.setLocation(self.x, self.y+1);
 			break;
 		}
 		return newPoint;
@@ -539,12 +576,25 @@ public class EndGameProblem extends GenericSearchProblem{
 			return false;
 	}
 	
-	int CalculateAllDamage(Point cell) 
+	
+	
+	HashMap<Point, String> CreateMirrorMap(HashMap<Point, String> original)
+	{
+		HashMap<Point, String> mirror = new HashMap<Point, String>();
+		
+		
+			mirror.putAll(original);
+		
+		
+		return mirror;
+		
+	}
+	int CalculateAllDamage(Point cell, EndGameState currState) 
 	{
 		int damage = 0;
 		
-		cell = GetCell(CurrentState.IronManPos,Actions.UP);
-		if(Warriors.get(cell) != null) 
+		cell = GetCell(currState.IronManPos,Actions.UP);
+		if(currState.CollectesWarriors.get(cell) == null) 
 		{
 			damage += 1;
 			
@@ -554,8 +604,8 @@ public class EndGameProblem extends GenericSearchProblem{
 		}
 		
 		//Check Right
-		cell = GetCell(CurrentState.IronManPos,Actions.RIGHT);
-		if(Warriors.get(cell) != null) {
+		cell = GetCell(currState.IronManPos,Actions.RIGHT);
+		if(currState.CollectesWarriors.get(cell) == null) {
 			damage += 1;
 			
 		}
@@ -564,8 +614,8 @@ public class EndGameProblem extends GenericSearchProblem{
 		}
 		
 		//Check Left
-		cell = GetCell(CurrentState.IronManPos,Actions.LEFT);
-		if(Warriors.get(cell) != null){
+		cell = GetCell(currState.IronManPos,Actions.LEFT);
+		if(currState.CollectesWarriors.get(cell) == null){
 			damage += 1;
 			
 		}
@@ -573,8 +623,8 @@ public class EndGameProblem extends GenericSearchProblem{
 			damage += 5;
 		}
 		//Check Down
-		cell = GetCell(CurrentState.IronManPos,Actions.DOWN);
-		if(Warriors.get(cell) != null) {
+		cell = GetCell(currState.IronManPos,Actions.DOWN);
+		if(currState.CollectesWarriors.get(cell) == null) {
 			damage += 1;
 			
 		}
@@ -589,8 +639,10 @@ public class EndGameProblem extends GenericSearchProblem{
 	//Goal Test
 		Boolean GoalTest(EndGameState state)
 		{
-			if ((state.IronManPos == ThanosPos) && (state.CollectedStones.size() == Stones.size()) && (state.ReceivedDamage <= 100))
+			System.out.println("IRONMAN POS = X: " +state.IronManPos.x + " Y: " + state.IronManPos.y + "\n Collected Stones: " + state.CollectedStones.size() + "\n Received damage = " + state.ReceivedDamage + "\n Nodes size = "+nodes.size()+ "\n\n" );
+			if ((state.IronManPos.x == ThanosPos.x) && (state.IronManPos.y == ThanosPos.y) && (state.CollectedStones.size() == Stones.size()) && (state.ReceivedDamage <= 100))
 			{
+				System.out.println("I DID IT");
 				return true;
 			}
 			else 
@@ -608,7 +660,7 @@ public class EndGameProblem extends GenericSearchProblem{
     	 while(!newNode.isRoot)
     	 {
     		 solution.add(newNode.action);
-    		 newNode = n.parent;
+    		 newNode = newNode.parent;
     	 }
     	 
     	 return solution;
@@ -626,6 +678,30 @@ public class EndGameProblem extends GenericSearchProblem{
     	 
     	 System.out.println(solution);
      }
+     
+     Boolean CompareStates(EndGameState existState, EndGameState newState) 
+     {
+    	 Boolean result = true;
+    	 
+    	 if((existState.IronManPos.x != newState.IronManPos.x) || (existState.IronManPos.y != newState.IronManPos.y)) 
+    	 {
+    		 result = false;
+    	 }
+    	 
+    	 if(existState.CollectedStones.size() != newState.CollectedStones.size()) 
+    	 {
+    		 result = false;
+    	 }
+    	 
+    	 if(existState.CollectesWarriors.size() != newState.CollectesWarriors.size()) 
+    	 {
+    		 result = false;
+    	 }
+    	 
+    	 return result;
+    	 
+    	 
+     }
 	 
      
      static void Solve(String grid, QingFunc q) {
@@ -638,8 +714,8 @@ public class EndGameProblem extends GenericSearchProblem{
  
  public static void main(String[]args) {
 
-	 
-	 
+	
+	 //Solve("2,2;0,0;1,1;0,1;1,0",QingFunc.BFS);
 	Solve("5,5;1,2;3,1;0,2,1,1,2,1,2,2,4,0,4,1;0,3,3,0,3,2,3,4,4,3",QingFunc.BFS);
 	 
  }
