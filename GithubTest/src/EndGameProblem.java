@@ -51,6 +51,7 @@ public class EndGameProblem extends GenericSearchProblem{
 		ActionsMap = new HashMap<Actions, Boolean>();
 		AllStates = new ArrayList<EndGameState>();
 		InstantiateActionMap();
+	
 		String tempGrid = grid.substring(0, 4);
 		 //grid.split(arg0)
 		 GridWidth = Character.getNumericValue(tempGrid.charAt(0));
@@ -674,11 +675,12 @@ public class EndGameProblem extends GenericSearchProblem{
      void PrintSolution(ArrayList<Actions> actions) 
      {
     	 String solution = "Path: ";
-    	 
-    	 for(int i=0; i<actions.size(); i++) 
+    	 ArrayList<Actions> revertedS=revertList(actions);
+    	 for(int i=0; i<revertedS.size(); i++) 
     	 {
-    		 solution += actions.get(i).toString() + " , ";
+    		 solution += revertedS.get(i).toString() + " , ";
     	 }
+    	 
     	 
     	 System.out.println(solution);
      }
@@ -708,13 +710,25 @@ public class EndGameProblem extends GenericSearchProblem{
      }
 	 
      
-    
-		
+    public static ArrayList<Actions> revertList(ArrayList<Actions> actions) {
+    	int size=actions.size();
+    	ArrayList<Actions> reverted= new ArrayList<Actions>(size);
+    	for(int i=0;i<size;i++) {
+    		reverted.add(i, actions.get(size-i-1));
+    	}
+    	return reverted;
+    	
+    }
+//	public String[] gridParse(String grid) {
+//		String[] gridArray=grid.split(";");
+//		
+//		
+//		return null;
+//		
+//	}	
 	
- 
- public static void main(String[]args) {
+  public static void main(String[]args) {
 
-	
 	
  }
 
