@@ -52,6 +52,7 @@ public class EndGameProblem extends GenericSearchProblem{
 		AllStates = new ArrayList<EndGameState>();
 		InstantiateActionMap();
 		String tempGrid = grid.substring(0, 4);
+		 //grid.split(arg0)
 		 GridWidth = Character.getNumericValue(tempGrid.charAt(0));
 		 GridHeight = Character.getNumericValue(tempGrid.charAt(2));
 		 grid = grid.substring(4, grid.length());
@@ -415,8 +416,11 @@ public class EndGameProblem extends GenericSearchProblem{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//General Search Function
 	
-	void GeneralSearch(EndGameProblem problem, QingFunc QF ) {
-		
+	
+	
+	@Override
+	void GeneralSearch(GenericSearchProblem problem, GenericSearchProblem.QingFunc QF) {
+		// TODO Auto-generated method stub
 		nodes = new LinkedList<Node>();
 		Node currentNode = new Node(InitialState, true);
 		Tree tree = new Tree(currentNode);
@@ -704,21 +708,17 @@ public class EndGameProblem extends GenericSearchProblem{
      }
 	 
      
-     static void Solve(String grid, QingFunc q) {
-    	 EndGameProblem endGame =  new EndGameProblem(grid);
-    	 
-    	 endGame.GeneralSearch(endGame, q);
-     }
+    
 		
 	
  
  public static void main(String[]args) {
 
 	
-	 //Solve("2,2;0,0;1,1;0,1;1,0",QingFunc.BFS);
-	Solve("5,5;1,2;3,1;0,2,1,1,2,1,2,2,4,0,4,1;0,3,3,0,3,2,3,4,4,3",QingFunc.BFS);
-	 
+	
  }
+
+
 	
 	
 }
