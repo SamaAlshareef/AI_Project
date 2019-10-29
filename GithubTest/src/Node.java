@@ -7,17 +7,19 @@ public class Node {
 	Node parent;
 	EndGameProblem.Actions action;
 	int depth;
+	int pathCost;
+	int HeuristicScore;
 	boolean isRoot;
 	ArrayList<Node> children;
 	
-	public Node(EndGameState State,Node parent,EndGameProblem.Actions action,int depth,boolean isRoot) {
+	public Node(EndGameState State,Node parent,EndGameProblem.Actions action,int heuristicFunc,int depth,boolean isRoot) {
 		this.state=State;
 		
 		this.parent=parent;
 		this.depth=depth;
-		
+		this.pathCost = State.ReceivedDamage;
 		this.action=action;
-		
+		this.HeuristicScore = heuristicFunc;
 		this.isRoot=isRoot;
 		children=new ArrayList<Node>();
 
@@ -29,6 +31,8 @@ public class Node {
 		if (isRoot) {
 			parent=null;
 			depth=0;
+			this.pathCost = 0;
+			this.HeuristicScore = 0;
 			this.isRoot=isRoot;
 			children=new ArrayList<Node>();
 		}
@@ -36,9 +40,9 @@ public class Node {
 
 		
 	}
-	public Node MakeChild(EndGameState state, EndGameProblem.Actions action) {
+	public Node MakeChild(EndGameState state, EndGameProblem.Actions action, int heuristicScore) {
 		
-		Node n = new Node(state,this,action,this.depth+1,false);
+		Node n = new Node(state,this,action,heuristicScore,this.depth+1,false);
 		children.add(n);
 		return n;
 	}
