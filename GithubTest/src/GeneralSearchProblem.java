@@ -5,16 +5,18 @@ public abstract class GeneralSearchProblem {
 	public enum QingFunc
 	{
 		
-		BFS,
-		DFS,
+		BF,
+		DF,
+		ID,
 		UC,
-		Astar,
-		Greedy,
-		IDFS
+		AS1,
+		AS2,
+		GR1,
+		GR2
 	}
 	
 	
-	abstract void GenericSearch(GeneralSearchProblem problem,QingFunc QF); 
+	abstract String GenericSearch(GeneralSearchProblem problem,QingFunc QF); 
 	
 	
 	

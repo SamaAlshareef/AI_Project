@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/EndGameTests.java</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Users/omare/AppData/Local/Temp/EndGameTests_30692.java</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
